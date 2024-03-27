@@ -8,11 +8,11 @@ def draw_board(board):
 
 def ask_and_make_move(player, board):
     # дать игроку возможность сделать ход, то есто есть ввести координаты
-		x, y = input(f"{player}, Введите x и y координаты (e.g. 0 0): ").strip().split()
+    x, y = input(f"{player}, Введите x и y координаты (e.g. 0 0): ").strip().split()
  
     x, y = int(x), int(y) 
     # находится ли координата в пределах поля и свободно ли место
-		if (0 <= x <= 2) and (0 <= y <= 2) and (board[x][y] == " "):
+    if (0 <= x <= 2) and (0 <= y <= 2) and (board[x][y] == " "):
         # если свободно, записать значение игрока (Х или 0) в ячейку
         board[x][y] = player
     else:
@@ -28,10 +28,10 @@ def ask_and_make_move(player, board):
 
 def ask_move(player, board):
     # дать игроку возможность сделать ход, то есто есть ввести координаты
-		x, y = input(f"{player}, Введите x и y координаты (e.g. 0 0): ").strip().split()
+    x, y = input(f"{player}, Введите x и y координаты (e.g. 0 0): ").strip().split()
     x, y = int(x), int(y) 
     # условие, которое проверяет, свободно ли место
-		if (0 <= x <= 2) and (0 <= y <= 2) and (board[x][y] == " "):
+    if (0 <= x <= 2) and (0 <= y <= 2) and (board[x][y] == " "):
         # если клетка свободна, вернуть её координаты
         return (x, y)
     else:
