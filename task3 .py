@@ -1,70 +1,96 @@
-from os.path import isfile
-from os import remove
+from os.path import isfile, splitext
+from os import remove, listdir
 
 
-def build_note(text, name):
-    with open(f"{name}.txt", "w", encoding="utf-8") as file:
-        file.write(text)
-    print(f"Заметка {name} создана.")
+# Добавлена возможность чтения файлов из "блокнота" Windows 
+def encod(note_name):
+    try:
+        with open(f"{note_name}.txt", encoding="utf-8") as file:
+            note_text = file.read()    
+    except:
+        with open(f"{note_name}.txt", encoding="cp1251") as file:
+            note_text = file.read()
+    return note_text
 
 
-# создание
-def create_note():
-    name = input("Введите название заметки: ")
-    text = input("Введите текст заметки: ")
-    build_note(text, name)
-
-
-# чтение
-def read_note(name):
-    if isfile(f"{name}.txt"):  # проверяем, существует ли файл
+def build_note(note_text, note_name):
+    while True:
+        # Добавлена защита от перезаписи существующих файлов
         try:
-            with open(f"{name}.txt", encoding="utf-8") as file:
-                text = file.read()
-        # Добавляем возможность чтения файлов из "блокнота" Windows
+            with open(f"{note_name}.txt", "x", encoding="utf-8") as file:
+                file.write(note_text)
+            print(f"Заметка {note_name} создана.")
+            break
         except:
-            with open(f"{name}.txt", encoding="cp1251") as file:
-                text = file.read()            
-        print(f'Текст заметки: {text}')
+            note_name = input('Файл уже существует! Введите название повторно: ')
+
+
+# 1. Создание заметки
+def create_note(note_name):
+    note_text = input("Введите текст заметки: ")
+    build_note(note_text, note_name)
+
+
+# 2. Чтение заметки
+def read_note(note_name):
+    if isfile(f"{note_name}.txt"):    # проверяем, существует ли файл
+        print(f'Текст заметки: {encod(note_name)}')
     else: 
         print('Заметка не найдена.')
 
 
-# изменение
-def edit_note(name):
-    if isfile(f"{name}.txt"):  # проверяем, существует ли файл
-        # Читаем  и выводим на экран
+# 3. Редактирование заметки
+def edit_note(note_name):
+    if isfile(f"{note_name}.txt"):  # проверяем, существует ли файл
+        # Читаем файл и выводим на экран
         print('Старый', end = ' ')
-        read_note(name)
+        read_note(note_name)
         # Перезаписываем файл
-        with open(f"{name}.txt", "w", encoding="utf-8") as file:
-            text = input('Введите новый текст: ')
-            file.write(text)
+        with open(f"{note_name}.txt", "w", encoding="utf-8") as file:
+            note_text = input('Введите новый текст: ')
+            file.write(note_text)
         # Выводим на экран перезаписанный файл
         print('Новый', end = ' ')
-        read_note(name)
+        read_note(note_name)
         print('Текст заметки успешно перезаписан.')
     else: 
         print('Заметка не найдена.')
 
 
-# удаление     
-def delete_note(name):    
-    if isfile(f"{name}.txt"):  # проверяем, существует ли файл
+# 4. Удаление заметки
+def delete_note(note_name):    
+    if isfile(f"{note_name}.txt"):  # проверяем, существует ли файл
         thirst_for_deletion = input(
             "\nВы действительно хотите удалить файл?\n"
-            "Если да, введите  'da', если нет - то произвольные символы: "
+            "Если да, введите 'da', если нет - то произвольные символы: "
             )
         if thirst_for_deletion == 'da':
-            remove(f"{name}.txt")
+            remove(f"{note_name}.txt")
             print('Заметка удалена!')
         else:
             print('Удаление отменено. Возврат в Основное Меню.')    
     else: 
         print('Заметка не найдена.')
+    
+
+# Подсчёт количества символов в файле
+def file_sise(note_name):  
+    return len(encod(splitext(note_name)[0]))
 
 
-# основной код
+# 5. Вывод списка заметок
+def display_notes():
+    notes = [note for note in listdir() if note.endswith(".txt")]
+    notes.sort(key=file_sise)    # Сортировка по длине заметок
+    if notes == []:
+        print('Текстовые файлы отсутствуют.')
+    else:
+        notes = '\n '.join(notes)
+        print('\nСписок текстовых файлов: \n', notes)
+
+
+
+# Основной код
 def main():
     while True:
         menu = {
@@ -72,8 +98,9 @@ def main():
             '2': 'read_note',
             '3': 'edit_note',
             '4': 'delete_note',
+            '5': 'display_notes'
         }
-        print('')   # добавляем одиночный отступ
+        print('')   
         
         # Вывод меню на экран
         for k in sorted(menu.keys()):
@@ -83,24 +110,17 @@ def main():
         key = input('\nВведите ключ операции. \
 Если хотите выйти, введите произвольные символы или пустоту: ').strip()
 
-        if key == '1' or key == '2' or key == '3' or key == '4':
-            print(f'Выбрана операция: {menu[key]}\n')
         # Вызов соответствующей операции или завершение программы        
         operation = menu.get(key)
-        if operation:
+        if None != operation != 'display_notes':    # Обработка операций с 1-ой по 4-ую
             print(f'Выбрана операция: {operation}\n')
             note_name = input("Введите название заметки: ")
             globals()[operation](note_name)
+        elif operation == 'display_notes':    # Обработка 5-ой операции
+            display_notes()
         else:
             print('Работа программы завершена.\n')
             break
 
-        # Вызов соответствующей операции или завершение программы
-        if key == '1':
-            create_note(note_name)
-        elif key == '2':
-            read_note(note_name)
-        elif key == '3':
-            edit_note(note_name)
-        elif key == '4':
-            delete_note(note_name)
+
+main()
