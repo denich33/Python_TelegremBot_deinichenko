@@ -35,7 +35,7 @@ def ask_to_delete_all_notes_handler(update, context):  # Спрашивание 
             f'Вы уверены? Удаляемые файлы: {", ".join(display_notes(update.message.chat_id))} \n Да - y/ Нет - n')
         return DELETE_ALL
     else:
-        update.message.reply_text(f'Заметок - нет 👿')
+        update.message.reply_text(f'Заметок - нет ')
         return ConversationHandler.END
 
 
